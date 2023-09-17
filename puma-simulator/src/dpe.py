@@ -27,7 +27,8 @@ import os
 import argparse
 
 
-root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+root_dir = "puma/simulator"
 src_dir = os.path.join(root_dir, "src")
 include_dir = os.path.join(root_dir, "include")
 test_dir = os.path.join(root_dir, "test")
