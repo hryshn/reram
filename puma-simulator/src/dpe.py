@@ -48,10 +48,16 @@ import numpy as np
 
 import argparse
 import config as cfg
-import reram.puma-simulator.include.constants as constants
+import constants
 import ima_modules
 import ima
+import tile_modules
+import tile
+import node_modules
+import node
 import ima_metrics
+import tile_metrics
+import node_metrics
 import dnn_wt_p
 from Factory import Factory
 
@@ -60,6 +66,12 @@ from Factory import Factory
 compiler_path = os.path.join(root_dir, "test/testasm/")
 trace_path = os.path.join(root_dir, "test/traces/")
 
+
+def count_tiles(net_path):
+    t_count = 0
+    while os.path.isdir(net_path + "/tile" + str(t_count)):
+        t_count += 1
+    return t_count
 
 
 class DPE:
@@ -88,6 +100,11 @@ class DPE:
             puma_crypto = f.crypto(cfg.cypher_name)
             puma_crypto.decrypt(instrndir)
         assert (os.path.exists(instrndir) ==1), 'Instructions for net missing: generate intuctions (in folder hierarchy) hierarchy'
+        '''if not os.path.exists(instrndir):
+            os.makedirs(instrndir)
+            for i in range (cfg.num_tile):
+                temp_tiledir = instrndir + '/tile' + str(i)
+                os.makedirs(temp_tiledir)'''
 
         if not os.path.exists(tracedir):
             os.makedirs(tracedir)
@@ -100,21 +117,21 @@ class DPE:
         self.instrnpath = instrndir + '/'
         self.tracepath = tracedir + '/'
 
-        # Instantiate the ima under test
+        # Instantiate the node under test
         # A physical node consists of several logical nodes equal to the actual node size
-        ima_dut = ima.ima()
+        node_dut = node.node()
 
         # Initialize the node with instrn & trace paths
         # instrnpath provides instrns for tile & resident imas
         # tracepath is where all tile & ima traces will be stored
-        ima_dut.ima_init(self.instrnpath, self.tracepath)
+        node_dut.node_init(self.instrnpath, self.tracepath)
 
         # Read the input data (input.t7) into the input tile's edram
      
         inp_filename = os.path.join(str(self.instrnpath) ,'input.npy')
 
 
-        inp_imaId = 0
+        inp_tileId = 0
         assert (os.path.exists(inp_filename)
                 ), 'Input Error: Provide input before running the DPE'
 
@@ -126,20 +143,21 @@ class DPE:
         print ('length of input data:', len(inp['data']))
         for i in range(len(inp['data'])):
             data = float2fixed(inp['data'][i], cfg.int_bits, cfg.frac_bits)
-            ima_dut.ima_list[inp_imaId].edram_controller.mem.memfile[i] = data
-            ima_dut.ima_list[inp_imaId].edram_controller.counter[i] = int(
+            node_dut.tile_list[inp_tileId].edram_controller.mem.memfile[i] = data
+            node_dut.tile_list[inp_tileId].edram_controller.counter[i] = int(
                 inp['counter'][i])
-            ima_dut.ima_list[inp_imaId].edram_controller.valid[i] = int(
+            node_dut.tile_list[inp_tileId].edram_controller.valid[i] = int(
                 inp['valid'][i])
 
         #program the X-bars with weights using the dnn_wt_p.dnn_wt() API
-        dnn_wt_p.dnn_wt().prog_dnn_wt(self.instrnpath, ima_dut)
+
+        dnn_wt_p.dnn_wt().prog_dnn_wt(self.instrnpath, node_dut)
 
         # Run all the tiles
         cycle = 0
         start = time.time()
-        while (not ima_dut.node_halt and cycle < cfg.cycles_max):
-            ima_dut.node_run(cycle)
+        while (not node_dut.node_halt and cycle < cfg.cycles_max):
+            node_dut.node_run(cycle)
             cycle = cycle + 1
 
         end = time.time()
@@ -148,24 +166,24 @@ class DPE:
         # For DEBUG only - dump the contents of all tiles
         # NOTE: Output and input tiles are dummy tiles to enable self-contained simulation
         if (cfg.debug):
-            node_dump(ima_dut, self.tracepath)
+            node_dump(node_dut, self.tracepath)
 
         #if (cfg.xbar_record):
-        #    record_xbar(ima_dut)
+        #    record_xbar(node_dut)
 
         # Dump the contents of output tile (DNN output) to output file (output.txt)
         output_file = self.tracepath + 'output.txt'
         fid = open(output_file, 'w')
         tile_id = cfg.num_tile - 1
         mem_dump(
-            fid, ima_dut.tile_list[tile_id].edram_controller.mem.memfile, 'EDRAM')
+            fid, node_dut.tile_list[tile_id].edram_controller.mem.memfile, 'EDRAM')
         fid.close()
         print('Output Tile dump finished')
 
         # Dump the harwdare access traces (For now - later upgrade to actual energy numbers)
         hwtrace_file = self.tracepath + 'harwdare_stats.txt'
         fid = open(hwtrace_file, 'w')
-        metric_dict = get_hw_stats(fid, ima_dut, cycle)
+        metric_dict = get_hw_stats(fid, node_dut, cycle)
         fid.close()
         print('Success: Hardware results compiled!!')
 
@@ -190,7 +208,23 @@ if __name__ == '__main__':
     cfg.cypher_hash = args.authenticated
     
     
-    model_path = os.path.join(compiler_path,net) 
+    if cfg.encrypted :
+        model_path = os.path.join(compiler_path,net,"crypto") 
+    else:
+        model_path = os.path.join(compiler_path,net) 
+
+    total_tiles = count_tiles(model_path) - 2
+    print(total_tiles)
+
+    if(args.tile != -1):
+        total_tiles = int(args.tile)
+
+    cfg.num_tile_compute = total_tiles
+    cfg.num_tile = cfg.num_node * cfg.num_tile_compute + 2
+    
+    #print(cfg.num_tile)
+    #print(cfg.encrypted)
+    #print(cfg.cypher_name)
    
     print('Input net is {}'.format(net))
     print(compiler_path)
