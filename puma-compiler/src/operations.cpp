@@ -262,6 +262,25 @@ ImagePixelStream maxpool(ImagePixelStream xsparam, unsigned int hspan, unsigned 
     return ImagePixelStream(ys);
 }
 
+ImagePixelStream res(ImagePixelStream xsparam, ImagePixelStream oriparam) {
+    ImagePixelStreamImpl* xs = xsparam.unwrap();
+    ImagePixelStreamImpl* ys = new ImagePixelStreamImpl(xs->getModel(), xs->imageWidth(), xs->imageHeight(), xs->nChannels());
+    ys->checkCompatibility(xs);
+    for(unsigned int t = 0; t < xs->nTiles(); ++t) {
+        ImagePixelStreamTile* xsTile = xs->getTile(t);
+        ImagePixelStreamTile* ysTile = ys->getTile(t);
+        // TODO: Convert the following into a single operation with codegened loops
+        for(unsigned int h = 0; h < xs->imageHeight(); ++h) {
+            for(unsigned int w = 0; w < xs->imageWidth(); ++w) {
+                ProducerOperation* x = xsTile->get(h, w);
+                ProducerOperation* y = new ALUVectorOperation(x->getModel(), ALUVectorOperation::SIG, x);
+                ysTile->add(h, w, y);
+            }
+        }
+    }
+    return ImagePixelStream(ys);
+}
+
 Vector operator*(ConstantMatrix Mparam, Vector xparam) {
     ConstantMatrixImpl* M = Mparam.unwrap();
     ModelImpl* model = M->getModel();

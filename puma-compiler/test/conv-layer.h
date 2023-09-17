@@ -27,5 +27,13 @@ static ImagePixelStream convmax_layer(Model model, std::string layerName, unsign
 
 }
 
+static ImagePixelStream convres_layer(Model model, std::string layerName, unsigned int k_size_x, unsigned int k_size_y, unsigned int in_size_x, unsigned int in_size_y, unsigned int in_channels, unsigned int out_channels, ImagePixelStream in_stream) {
+
+    ConvolutionalConstantMatrix mat = ConvolutionalConstantMatrix::create(model, layerName + "conv_mat", k_size_x, k_size_y, in_channels, out_channels);
+    ImagePixelStream *res = operator(mat, sig(mat*in_stream));
+    return *res;
+
+}
+
 #endif
 
