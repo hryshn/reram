@@ -8,7 +8,7 @@
 from data_convert import *
 import config as cfg
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 def record_xbar (node):
     xbar_currents = []
@@ -35,10 +35,12 @@ def record_xbar (node):
     #plt.plot(np.reshape(xbar_currents_arr, arr_size))
     flat_arr = np.reshape(xbar_currents_arr, arr_size)
     weights = np.ones_like(flat_arr)/float(len(flat_arr))
-    plt.hist(flat_arr, bins=50, weights=weights)
-    plt.title("Xbar current distribution")
-    plt.ylabel("Fraction")
-    plt.xlabel("Xbar current")
-    plt.show()
+    np.savetxt("Xbar_current", flat_arr)
+    np.savetxt("weights", weights)
+    # plt.hist(flat_arr, bins=50, weights=weights)
+    # plt.title("Xbar current distribution")
+    # plt.ylabel("Fraction")
+    # plt.xlabel("Xbar current")
+    # plt.show()
 
 
