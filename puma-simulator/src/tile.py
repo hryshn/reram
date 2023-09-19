@@ -1,13 +1,13 @@
 # Defines a configurable tile with its methods
 
 import sys, json
-sys.path.insert (0, '/home/aa/dpe_emulate/include')
+sys.path.insert (0, '/home/puma/simulator/include')
 
 import Queue
 
 import numpy as np
 import config as cfg
-import reram.puma-simulator.include.constants as param
+import constants as param
 import ima as ima
 import tile_modules as tmod
 

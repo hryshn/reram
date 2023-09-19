@@ -3,7 +3,7 @@
 
 import sys
 import config as cfg
-import reram.puma-simulator.include.constants as param
+import constants as param
 import ima_modules
 from ima_modules import int2bin
 

@@ -1,11 +1,11 @@
 # Defines a configurable node with its methods
 import sys, getopt
-sys.path.insert (0, '/home/aa/dpe_emulate/include/')
-sys.path.insert (0, '/home/aa/dpe_emulate/src/')
+sys.path.insert (0, '/home/puma/simulator/include/')
+sys.path.insert (0, '/home/puma/simulator/src/')
 
 import numpy as np
 import config as cfg
-import reram.puma-simulator.include.constants as param
+import constants as param
 import ima_modules
 import ima
 import tile_modules

@@ -7,7 +7,7 @@
 #   4. IMA's xbar output memory
 
 import sys
-sys.path.insert (0, '/home/aa/dpe_emulate/src/')
+sys.path.insert (0, '/home/puma/simulator/src/')
 
 from data_convert import *
 import config as cfg

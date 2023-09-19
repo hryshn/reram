@@ -6,7 +6,7 @@
 import sys
 
 import numpy as np
-import reram.puma-simulator.include.constants as param
+import constants as param
 import config as cfg
 import math
 from data_convert import *

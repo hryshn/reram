@@ -2,9 +2,9 @@
 import sys
 
 import numpy as np
-from src.data_convert import *
-import include.config as cfg
-import include.constants as param
+from data_convert import *
+import config as cfg
+import constants as param
 
 from src.data_convert import *
 

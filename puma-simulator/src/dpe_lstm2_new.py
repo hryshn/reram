@@ -25,7 +25,7 @@ from data_convert import *
 from node_dump import *
 import numpy as np
 
-import reram.puma-simulator.include.constants as param
+import constants as param
 import ima_modules
 import ima
 import tile_modules

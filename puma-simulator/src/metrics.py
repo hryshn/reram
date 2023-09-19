@@ -4,7 +4,7 @@ import sys
 
 # import dependency files
 import config as cfg
-import reram.puma-simulator.include.constants as param
+import constants as param
 
 # Compute metrics of the ima based on paramaters in config file and dicts in constants file
 # Area is computed as the summation of all component area (doesn't consider physical layout)

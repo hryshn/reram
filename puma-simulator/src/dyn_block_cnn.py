@@ -3,11 +3,11 @@ import sys, json
 # import dependancy files
 import numpy as np
 import math
-import include.config as cfg
+import config as cfg
 #import include.configTest as cfg
-import include.constants as param
+import constants as param
 import constants_digital as digi_param
-import src.ima_modules as imod
+import ima_modules as imod
 
 from data_convert import *
 

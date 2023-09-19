@@ -3,7 +3,7 @@ import sys
 
 # import dependency files
 import config as cfg
-import reram.puma-simulator.include.constants as param
+import constants as param
 import ima_metrics
 
 # Compute metrics of the tile based on paramaters in config file and dicts file constants file
