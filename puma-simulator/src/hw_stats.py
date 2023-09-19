@@ -2,7 +2,7 @@
 # Write to file
 import sys
 import config as cfg
-import reram.puma-simulator.include.constants as param
+import constants as param
 import node_metrics
 import tile_metrics
 import ima_metrics
